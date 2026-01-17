@@ -213,3 +213,4 @@ data/
 experiment/
 logs/
 *.log
+artifacts/

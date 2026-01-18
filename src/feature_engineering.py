@@ -137,8 +137,7 @@ def main():
         logger.debug("Max features loaded from params.yaml: %d", max_features)
 
         train_data = load_data("./data/interim/train_processed.csv")
-        test_data = load_data("./data/interim/test_processed.csv")
-
+        test_data = load_data("./data/interim/test_processed.csv")  
         train_df, test_df = apply_tfidf(
             train_data=train_data,
             test_data=test_data,

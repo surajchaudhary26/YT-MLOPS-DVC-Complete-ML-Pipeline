@@ -215,3 +215,4 @@ logs/
 *.log
 artifacts/
 reports/
+dvclive/

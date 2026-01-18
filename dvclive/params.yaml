@@ -1,0 +1,4 @@
+n_estimators: 200
+random_state: 42
+max_depth:
+max_features: 5000

@@ -24,3 +24,26 @@ Expermients with DVC:
 16> Do "dvc exp remove {exp-name}" to remove exp (optional) | "dvc exp apply {exp-name}" to reproduce prev exp
 17> Change params, re-run code (produce new experiments)
 18> Now git add, commit, push
+
+Branch Based Experiment Workflow (Multi-Model Setup):
+19> Choose and fix a baseline model run (best accuracy or best recall) and commit it on main branch.
+20> Create a new branch for experiments:
+    "git checkout -b experiment/multi-model"
+21> Update params.yaml to support model selection using:
+    model_building.model_name: rf / logreg / nb
+22> Restructure params.yaml to treat all models equally using:
+    models.rf, models.logreg, models.nb blocks
+23> Update src/model_building.py to train the selected model based on model_name:
+    RandomForest / LogisticRegression / MultinomialNB
+24> Update dvc.yaml model_building stage params tracking keys:
+    Replace old keys (model_building.n_estimators, etc.)
+    With new keys (models.rf.*, models.logreg.*, models.nb.*, model_building.model_name)
+25> Run experiments one by one:
+    "dvc exp run -S model_building.model_name=rf"
+    "dvc exp run -S model_building.model_name=logreg"
+    "dvc exp run -S model_building.model_name=nb"
+26> Compare experiments results:
+    "dvc exp show"
+    or check using VS Code DVC extension Experiments tab
+27> Identify best model based on metrics (accuracy/precision/recall/auc) and finalize the best config.
+28> Now git add, commit, push from experiment branch.

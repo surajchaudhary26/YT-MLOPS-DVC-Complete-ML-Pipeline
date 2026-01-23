@@ -4,7 +4,10 @@ import yaml
 import joblib
 import numpy as np
 import pandas as pd
+
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
 
 
 # ============================
@@ -18,7 +21,7 @@ log_file_path = os.path.join(log_dir, "model_building.log")
 logger = logging.getLogger("model_building")
 logger.setLevel(logging.DEBUG)
 
-# ✅ prevent duplicate logs
+# prevent duplicate logs
 if logger.hasHandlers():
     logger.handlers.clear()
 
@@ -71,19 +74,47 @@ def split_features_labels(df: pd.DataFrame, label_col: str = "label"):
     return X, y
 
 
-def train_model(X_train: np.ndarray, y_train: np.ndarray, params: dict) -> RandomForestClassifier:
+def train_model(X_train: np.ndarray, y_train: np.ndarray, model_building_params: dict, full_params: dict):
     try:
         if X_train.shape[0] != y_train.shape[0]:
             raise ValueError("X_train and y_train must have same number of rows!")
 
-        logger.debug("Training RandomForest with params: %s", params)
+        model_name = model_building_params.get("model_name", "rf").lower().strip()
+        logger.debug("Selected model_name: %s", model_name)
 
-        clf = RandomForestClassifier(
-            n_estimators=params.get("n_estimators", 100),
-            random_state=params.get("random_state", 42),
-            max_depth=params.get("max_depth", None),
-            n_jobs=-1
-        )
+        models_cfg = full_params.get("models", {})
+        selected_cfg = models_cfg.get(model_name, {})
+
+        if not selected_cfg:
+            raise ValueError(
+                f"Config not found for model '{model_name}' in params.yaml under 'models:'"
+            )
+
+        if model_name == "rf":
+            clf = RandomForestClassifier(
+                n_estimators=selected_cfg.get("n_estimators", 100),
+                random_state=selected_cfg.get("random_state", 42),
+                max_depth=selected_cfg.get("max_depth", None),
+                n_jobs=-1,
+                class_weight=selected_cfg.get("class_weight", None),
+            )
+
+        elif model_name == "logreg":
+            clf = LogisticRegression(
+                max_iter=selected_cfg.get("max_iter", 2000),
+                C=selected_cfg.get("C", 1.0),
+                class_weight=selected_cfg.get("class_weight", None),
+            )
+
+        elif model_name == "nb":
+            clf = MultinomialNB(
+                alpha=selected_cfg.get("alpha", 1.0)
+            )
+
+        else:
+            raise ValueError(f"Invalid model_name '{model_name}'. Use rf / logreg / nb")
+
+        logger.debug("Training model with config: %s", selected_cfg)
 
         clf.fit(X_train, y_train)
         logger.debug("Model training completed")
@@ -110,14 +141,14 @@ def save_model(model, file_path: str) -> None:
 def main():
     try:
         params = load_params("params.yaml")
-        model_params = params.get("model_building", {})
+        model_building_params = params.get("model_building", {})
 
         logger.debug("Model params loaded")
 
         train_df = load_data("./data/processed/train_tfidf.csv")
         X_train, y_train = split_features_labels(train_df, label_col="label")
 
-        clf = train_model(X_train, y_train, model_params)
+        clf = train_model(X_train, y_train, model_building_params, params)
 
         model_save_path = "./artifacts/model.pkl"
         save_model(clf, model_save_path)

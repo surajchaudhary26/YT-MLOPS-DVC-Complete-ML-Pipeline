@@ -5,8 +5,8 @@ stages:
     deps:
     - path: params.yaml
       hash: md5
-      md5: ad0f1244c610dde55394ee95214a5349
-      size: 314
+      md5: 8e736c58000811e9ae8fb73c3c112233
+      size: 324
     - path: src/data_ingestion.py
       hash: md5
       md5: 862f306a32291afcc1fefca2e32f57b9
@@ -60,8 +60,8 @@ stages:
       size: 203794
     - path: params.yaml
       hash: md5
-      md5: ad0f1244c610dde55394ee95214a5349
-      size: 314
+      md5: 8e736c58000811e9ae8fb73c3c112233
+      size: 324
     - path: src/feature_engineering.py
       hash: md5
       md5: 5fb532a7bde1c4f5c397b08d2c906981
@@ -72,7 +72,7 @@ stages:
     outs:
     - path: artifacts/tfidf_vectorizer.pkl
       hash: md5
-      md5: a3c7a9730fa67d9e9bc611665145e724
+      md5: 61ddc00ef59e258d934e4094411d90e0
       size: 141969
     - path: data/processed/test_tfidf.csv
       hash: md5
@@ -91,37 +91,43 @@ stages:
       size: 67536720
     - path: params.yaml
       hash: md5
-      md5: ad0f1244c610dde55394ee95214a5349
-      size: 314
+      md5: 8e736c58000811e9ae8fb73c3c112233
+      size: 324
     - path: src/model_building.py
       hash: md5
-      md5: de7b5f21464bbf80b3a266c47d16f84a
-      size: 3743
+      md5: 36ba87cf0a430a4b7c6960bd19d13bcb
+      size: 4934
     params:
       params.yaml:
-        model_building.max_depth:
-        model_building.n_estimators: 500
-        model_building.random_state: 42
+        model_building.model_name: nb
+        models.logreg.C: 1.0
+        models.logreg.class_weight: balanced
+        models.logreg.max_iter: 2000
+        models.nb.alpha: 1.0
+        models.rf.class_weight: balanced
+        models.rf.max_depth:
+        models.rf.n_estimators: 500
+        models.rf.random_state: 42
     outs:
     - path: artifacts/model.pkl
       hash: md5
-      md5: 744fc528409a44bf0da508c7df9be2c9
-      size: 27458089
+      md5: 733f1e89f1a70645abbefec4fe57794f
+      size: 128791
   model_evaluation:
     cmd: python3 src/model_evaluation.py
     deps:
     - path: artifacts/model.pkl
       hash: md5
-      md5: 744fc528409a44bf0da508c7df9be2c9
-      size: 27458089
+      md5: 733f1e89f1a70645abbefec4fe57794f
+      size: 128791
     - path: data/processed/test_tfidf.csv
       hash: md5
       md5: 49d2539653f7f5dc6cd043764b9d2576
       size: 17420458
     - path: params.yaml
       hash: md5
-      md5: ad0f1244c610dde55394ee95214a5349
-      size: 314
+      md5: 8e736c58000811e9ae8fb73c3c112233
+      size: 324
     - path: src/model_evaluation.py
       hash: md5
       md5: 712a9cc272d9ca334fd6089cec08b3e4
@@ -129,10 +135,10 @@ stages:
     outs:
     - path: dvclive/metrics.json
       hash: md5
-      md5: f316444d2b525e654b82a2aa1d79e26f
-      size: 141
+      md5: a003f94e1dd4b2093089c5eb079229bf
+      size: 126
     - path: dvclive/plots/metrics
       hash: md5
-      md5: 5ef1fc07aad5d4d549fe59ff816f5c72.dir
-      size: 134
+      md5: d7eb86651a6535f3f0edee3cd9edeb5f.dir
+      size: 119
       nfiles: 4

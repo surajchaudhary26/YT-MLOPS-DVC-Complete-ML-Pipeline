@@ -41,11 +41,18 @@ stages:
     - data/processed/train_tfidf.csv
     - params.yaml
     params:
-    - model_building.n_estimators
-    - model_building.random_state
-    - model_building.max_depth
+    - model_building.model_name
+    - models.rf.n_estimators
+    - models.rf.random_state
+    - models.rf.max_depth
+    - models.rf.class_weight
+    - models.logreg.max_iter
+    - models.logreg.C
+    - models.logreg.class_weight
+    - models.nb.alpha
     outs:
     - artifacts/model.pkl
+
 
   model_evaluation:
     cmd: python3 src/model_evaluation.py

@@ -5,7 +5,7 @@ feature_engineering:
   max_features: 4000
 
 model_building:
-  model_name: nb      # rf / logreg / nb
+  model_name: logreg  # rf / logreg / nb
 
 models:
   rf:

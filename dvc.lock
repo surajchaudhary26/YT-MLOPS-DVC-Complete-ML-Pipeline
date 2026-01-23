@@ -5,7 +5,7 @@ stages:
     deps:
     - path: params.yaml
       hash: md5
-      md5: 8e736c58000811e9ae8fb73c3c112233
+      md5: 2c2a872c4ff327e7665d3acdfc256a7a
       size: 324
     - path: src/data_ingestion.py
       hash: md5
@@ -60,7 +60,7 @@ stages:
       size: 203794
     - path: params.yaml
       hash: md5
-      md5: 8e736c58000811e9ae8fb73c3c112233
+      md5: 2c2a872c4ff327e7665d3acdfc256a7a
       size: 324
     - path: src/feature_engineering.py
       hash: md5
@@ -72,7 +72,7 @@ stages:
     outs:
     - path: artifacts/tfidf_vectorizer.pkl
       hash: md5
-      md5: 61ddc00ef59e258d934e4094411d90e0
+      md5: 816bd0f1af03a4860f54c33151e7987d
       size: 141969
     - path: data/processed/test_tfidf.csv
       hash: md5
@@ -91,7 +91,7 @@ stages:
       size: 67536720
     - path: params.yaml
       hash: md5
-      md5: 8e736c58000811e9ae8fb73c3c112233
+      md5: 2c2a872c4ff327e7665d3acdfc256a7a
       size: 324
     - path: src/model_building.py
       hash: md5
@@ -99,7 +99,7 @@ stages:
       size: 4934
     params:
       params.yaml:
-        model_building.model_name: nb
+        model_building.model_name: logreg
         models.logreg.C: 1.0
         models.logreg.class_weight: balanced
         models.logreg.max_iter: 2000
@@ -111,34 +111,34 @@ stages:
     outs:
     - path: artifacts/model.pkl
       hash: md5
-      md5: 733f1e89f1a70645abbefec4fe57794f
-      size: 128791
+      md5: b99ba208f99bfd64898ecb9f2507f926
+      size: 32863
   model_evaluation:
     cmd: python3 src/model_evaluation.py
     deps:
     - path: artifacts/model.pkl
       hash: md5
-      md5: 733f1e89f1a70645abbefec4fe57794f
-      size: 128791
+      md5: b99ba208f99bfd64898ecb9f2507f926
+      size: 32863
     - path: data/processed/test_tfidf.csv
       hash: md5
       md5: 49d2539653f7f5dc6cd043764b9d2576
       size: 17420458
     - path: params.yaml
       hash: md5
-      md5: 8e736c58000811e9ae8fb73c3c112233
+      md5: 2c2a872c4ff327e7665d3acdfc256a7a
       size: 324
     - path: src/model_evaluation.py
       hash: md5
-      md5: 712a9cc272d9ca334fd6089cec08b3e4
-      size: 4667
+      md5: 1ccf73bb34abe210fbe5c3d879bfaad7
+      size: 5175
     outs:
     - path: dvclive/metrics.json
       hash: md5
-      md5: a003f94e1dd4b2093089c5eb079229bf
-      size: 126
+      md5: 38003c36cd6ae7f3e186dc1d80bbfc42
+      size: 141
     - path: dvclive/plots/metrics
       hash: md5
-      md5: d7eb86651a6535f3f0edee3cd9edeb5f.dir
-      size: 119
+      md5: 3fde762a61422aea68fda7f66c2e8f0c.dir
+      size: 134
       nfiles: 4

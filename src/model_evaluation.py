@@ -20,7 +20,7 @@ log_file_path = os.path.join(log_dir, "model_evaluation.log")
 logger = logging.getLogger("model_evaluation")
 logger.setLevel(logging.DEBUG)
 
-# ✅ prevent duplicate logs
+# prevent duplicate logs
 if logger.hasHandlers():
     logger.handlers.clear()
 
@@ -87,12 +87,13 @@ def evaluate_model(clf, X_test: np.ndarray, y_test: np.ndarray) -> dict:
     try:
         y_pred = clf.predict(X_test)
 
-        # ✅ proba only if classifier supports it
+        auc = None
         if hasattr(clf, "predict_proba"):
-            y_pred_proba = clf.predict_proba(X_test)[:, 1]
-            auc = roc_auc_score(y_test, y_pred_proba)
-        else:
-            auc = None
+            try:
+                y_pred_proba = clf.predict_proba(X_test)[:, 1]
+                auc = roc_auc_score(y_test, y_pred_proba)
+            except Exception:
+                auc = None
 
         metrics_dict = {
             "accuracy": float(accuracy_score(y_test, y_pred)),
@@ -101,7 +102,7 @@ def evaluate_model(clf, X_test: np.ndarray, y_test: np.ndarray) -> dict:
             "auc": float(auc) if auc is not None else None,
         }
 
-        logger.debug("Model evaluation metrics calculated")
+        logger.debug("Model evaluation metrics calculated: %s", metrics_dict)
         return metrics_dict
 
     except Exception as e:
@@ -111,9 +112,13 @@ def evaluate_model(clf, X_test: np.ndarray, y_test: np.ndarray) -> dict:
 
 def save_metrics(metrics: dict, file_path: str) -> None:
     try:
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        dir_name = os.path.dirname(file_path)
+        if dir_name:
+            os.makedirs(dir_name, exist_ok=True)
+
         with open(file_path, "w") as file:
             json.dump(metrics, file, indent=4)
+
         logger.debug("Metrics saved to %s", file_path)
     except Exception as e:
         logger.error("Error saving metrics: %s", e)
@@ -127,7 +132,6 @@ def main():
     try:
         params = load_params("params.yaml")
 
-        # ✅ correct path (your training saved here)
         model_path = "./artifacts/model.pkl"
         clf = load_model(model_path)
 
@@ -136,18 +140,25 @@ def main():
 
         metrics = evaluate_model(clf, X_test, y_test)
 
-        # ✅ Save metrics in reports
+        # Save metrics in reports folder
         save_metrics(metrics, "reports/metrics.json")
 
-        # ✅ DVC Live logging
+        # DVCLive logging (this updates dvclive/metrics.json + plots)
+        model_building_cfg = params.get("model_building", {})
+        models_cfg = params.get("models", {})
+        selected_model_name = model_building_cfg.get("model_name", "rf")
+        selected_model_cfg = models_cfg.get(selected_model_name, {})
+
         with Live(save_dvc_exp=True) as live:
             for k, v in metrics.items():
                 if v is not None:
                     live.log_metric(k, v)
 
-            # log only model params (clean)
-            live.log_params(params.get("model_building", {}))
-            live.log_params(params.get("feature_engineering", {}))
+            # Log important params for reproducibility
+            live.log_params({"model_name": selected_model_name})
+            live.log_params({"model_params": selected_model_cfg})
+            live.log_params({"feature_engineering": params.get("feature_engineering", {})})
+            live.log_params({"data_ingestion": params.get("data_ingestion", {})})
 
         logger.debug("Model evaluation completed successfully!")
 

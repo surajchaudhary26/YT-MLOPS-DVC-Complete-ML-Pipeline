@@ -47,3 +47,15 @@ Branch Based Experiment Workflow (Multi-Model Setup):
     or check using VS Code DVC extension Experiments tab
 27> Identify best model based on metrics (accuracy/precision/recall/auc) and finalize the best config.
 28> Now git add, commit, push from experiment branch.
+
+To run multi-model
+
+1> First step
+   dvc exp run --queue -S model_building.model_name=rf
+   dvc exp run --queue -S model_building.model_name=logreg
+   dvc exp run --queue -S model_building.model_name=nb
+   dvc exp run --run-all
+2> 
+  dvc exp show --include-params model_building.model_name
+
+
